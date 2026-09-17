@@ -1,6 +1,8 @@
-# GSP351 — Migrate MySQL Data to Cloud SQL Using DMS
+# GSP351 — Fresh Lab Task-wise Scripts
 
-Every lab task has a separate script. Run them in order in the same authenticated Cloud Shell session:
+Fresh lab values: source VM `prd-fin-lf4`, one-time target `mysql-fin-lf4`, continuous target `mysql-fin-lf4-cont`, region `europe-west1`, zone `europe-west1-b`.
+
+Run in order:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/mdshahid000/gsp351-dms-challenge/master/01_task1_create_connection_profile.sh && chmod +x 01_task1_create_connection_profile.sh && ./01_task1_create_connection_profile.sh
@@ -10,6 +12,6 @@ curl -fsSLO https://raw.githubusercontent.com/mdshahid000/gsp351-dms-challenge/m
 curl -fsSLO https://raw.githubusercontent.com/mdshahid000/gsp351-dms-challenge/master/05_task5_promote_destination.sh && chmod +x 05_task5_promote_destination.sh && ./05_task5_promote_destination.sh
 ```
 
-Task 1 uses the external IP of `dev-fin-vpp` and creates the source profile. Task 2 targets the existing `mysql-fin-vpp` instance with a one-time migration. Task 3 targets `mysql-fin-vpp-cont` with a continuous migration using VPC peering and waits for the job to run. Task 4 performs the required source update (`addressKey=934`) and checks the destination. Task 5 promotes the continuous destination to standalone.
+Important: Tasks 2 and 3 scripts are preflight/checklist scripts. Complete the DMS destination selection in the Google Cloud console exactly as the lab requires: choose Existing instance, not a new destination profile. Task 2 uses `mysql-fin-lf4` and IP allowlist/static IP. Task 3 uses `mysql-fin-lf4-cont` and VPC peering with the `default` VPC. Do not run generic `gcloud connection-profiles create` commands for the existing target instances.
 
-If the DMS console requires confirmation for an existing destination instance, choose the provided instance exactly; do not create a different Cloud SQL instance. Expected initial customer count is 5030. Allow approximately 30–55 minutes because the migration jobs and initial data copy can take time.
+Wait for Task 2 to finish and verify 5030 rows before creating Task 3. Wait for Task 3 to reach Running before Task 4. After Task 4 replication is verified, run Task 5 promotion. Approximate total time is 30–55 minutes.
